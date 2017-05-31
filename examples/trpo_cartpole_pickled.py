@@ -12,7 +12,7 @@ def run_task(*_):
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
         # The neural network policy should have two hidden layers, each with 32 hidden units.
-        hidden_sizes=(32, 32)
+        hidden_sizes=(32, 32, 32, 32)
     )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
@@ -23,7 +23,7 @@ def run_task(*_):
         baseline=baseline,
         batch_size=4000,
         max_path_length=100,
-        n_itr=1000,
+        n_itr=100,
         discount=0.99,
         step_size=0.01,
         # Uncomment both lines (this and the plot parameter below) to enable plotting

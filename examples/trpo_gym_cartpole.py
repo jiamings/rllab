@@ -4,19 +4,24 @@ from rllab.envs.gym_env import GymEnv
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 from rllab.policies.categorical_mlp_policy import CategoricalMLPPolicy
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('arch', type=str)
+args = parser.parse_args()
+arch = tuple([int(a) for a in args.arch.split('-')])
 
 def run_task(*_):
     # Please note that different environments with different action spaces may
     # require different policies. For example with a Discrete action space, a
     # CategoricalMLPPolicy works, but for a Box action space may need to use
     # a GaussianMLPPolicy (see the trpo_gym_pendulum.py example)
-    env = normalize(GymEnv("CartPole-v0"))
+    env = normalize(GymEnv("CartPole-v0", record_video=False))
 
     policy = CategoricalMLPPolicy(
         env_spec=env.spec,
         # The neural network policy should have two hidden layers, each with 32 hidden units.
-        hidden_sizes=(8, 8)
+        hidden_sizes=arch
     )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
@@ -27,7 +32,7 @@ def run_task(*_):
         baseline=baseline,
         batch_size=4000,
         max_path_length=env.horizon,
-        n_itr=50,
+        n_itr=200,
         discount=0.99,
         step_size=0.01,
         # Uncomment both lines (this and the plot parameter below) to enable plotting
@@ -38,6 +43,8 @@ def run_task(*_):
 
 run_experiment_lite(
     run_task,
+    exp_prefix='cartpole',
+    exp_name=args.arch,
     # Number of parallel workers for sampling
     n_parallel=1,
     # Only keep the snapshot parameters for the last iteration
